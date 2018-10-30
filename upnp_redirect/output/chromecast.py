@@ -1,4 +1,5 @@
 import pychromecast
+import logging
 
 
 class Chromecast(object):
@@ -7,6 +8,8 @@ class Chromecast(object):
         self._args = args
 
     def run(self):
+        logging.info('run chromecast command:%s' % self._args.chromecast_cmd)
+
         chromecasts = pychromecast.get_chromecasts()
         for cc in chromecasts:
             if self._args.chromecast_cmd == 'list':
