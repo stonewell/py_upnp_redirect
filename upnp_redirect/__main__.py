@@ -4,7 +4,7 @@ import logging
 
 logging.getLogger('').setLevel(logging.INFO)
 
-from .output import chromecast, run
+from .commands import chromecast, run
 
 
 def arguments():
