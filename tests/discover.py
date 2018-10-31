@@ -3,7 +3,7 @@ import socket
 msg = \
     'M-SEARCH * HTTP/1.1\r\n' \
     'HOST:239.255.255.250:1900\r\n' \
-    'ST:upnp:rootdevice\r\n' \
+    'ST:urn:schemas-upnp-org:device:MediaRenderer:1\r\n' \
     'MX:2\r\n' \
     'MAN:"ssdp:discover"\r\n' \
     '\r\n'
@@ -16,6 +16,6 @@ s.sendto(msg.encode(), ('239.255.255.250', 1900) )
 try:
     while True:
         data, addr = s.recvfrom(65507)
-        print(addr, data)
+        print(addr, '[%s]' % data.decode('utf-8'))
 except socket.timeout:
     pass
