@@ -1,9 +1,17 @@
+import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import threading
 import logging
 
 PORT_NUMBER = 8080
 
+
+service_xmls_ = {}
+
+for c in ['AVTransport', 'ConnectionManager', 'RenderingControl']:
+    for n in ['control', 'event', 'scpd']:
+        path = '/{}/{}.xml'.format(c, n)
+        service_xmls_[path] = (c.lower(), n.lower())
 
 class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
     """
@@ -20,12 +28,26 @@ class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(self.get_device_xml().encode())
             return
+        elif self.path in service_xmls_:
+            self.send_response(200)
+            self.send_header('Content-type', 'application/xml')
+            self.end_headers()
+
+            c, n = service_xmls_[self.path]
+            self.wfile.write(self.load_descriptor(c, n).encode())
+            return
         else:
             self.send_response(404)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
             self.wfile.write(b"Not found.")
             return
+
+    @staticmethod
+    def load_descriptor(category, name):
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        desc_path = os.path.join(BASE_DIR, 'descriptors', category, name + '.xml')
+        return open(desc_path).read()
 
     def do_POST(self):
         # <--- Gets the size of data
@@ -62,23 +84,23 @@ class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
       <service>
         <serviceType>urn:schemas-upnp-org:service:AVTransport:1</serviceType>
         <serviceId>urn:upnp-org:serviceId:AVTransport</serviceId>
-        <controlURL>/AVTransport/{uuid}/control.xml</controlURL>
-        <eventSubURL>/AVTransport/{uuid}/event.xml</eventSubURL>
-        <SCPDURL>/AVTransport/{uuid}/scpd.xml</SCPDURL>
+        <controlURL>/AVTransport/control.xml</controlURL>
+        <eventSubURL>/AVTransport/event.xml</eventSubURL>
+        <SCPDURL>/AVTransport/scpd.xml</SCPDURL>
       </service>
       <service>
         <serviceType>urn:schemas-upnp-org:service:ConnectionManager:1</serviceType>
         <serviceId>urn:upnp-org:serviceId:ConnectionManager</serviceId>
-        <SCPDURL>/ConnectionManager/{uuid}/scpd.xml</SCPDURL>
-        <controlURL>/ConnectionManager/{uuid}/control.xml</controlURL>
-        <eventSubURL>/ConnectionManager/{uuid}/event.xml</eventSubURL>
+        <SCPDURL>/ConnectionManager/scpd.xml</SCPDURL>
+        <controlURL>/ConnectionManager/control.xml</controlURL>
+        <eventSubURL>/ConnectionManager/event.xml</eventSubURL>
       </service>
       <service>
         <serviceType>urn:schemas-upnp-org:service:RenderingControl:1</serviceType>
         <serviceId>urn:upnp-org:serviceId:RenderingControl</serviceId>
-        <SCPDURL>/RenderingControl/{uuid}/scpd.xml</SCPDURL>
-        <controlURL>/RenderingControl/{uuid}/control.xml</controlURL>
-        <eventSubURL>/RenderingControl/{uuid}/event.xml</eventSubURL>
+        <SCPDURL>/RenderingControl/scpd.xml</SCPDURL>
+        <controlURL>/RenderingControl/control.xml</controlURL>
+        <eventSubURL>/RenderingControl/event.xml</eventSubURL>
       </service>
     </serviceList>
   </device>
@@ -94,17 +116,6 @@ class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
                           uuid=self.server.uuid,
                           presentation_url=self.server.presentation_url)
 
-    @staticmethod
-    def get_wsd_xml():
-        """
-        Get the device WSD file.
-        """
-        return """<scpd xmlns="urn:schemas-upnp-org:service-1-0">
-<specVersion>
-<major>1</major>
-<minor>0</minor>
-</specVersion>
-</scpd>"""
 
 
 class UPNPHTTPServerBase(HTTPServer):
