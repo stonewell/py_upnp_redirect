@@ -14,12 +14,6 @@ class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         logging.info('http server get path:%s' % self.path)
 
-        if self.path == '/boucherie_wsd.xml':
-            self.send_response(200)
-            self.send_header('Content-type', 'application/xml')
-            self.end_headers()
-            self.wfile.write(self.get_wsd_xml().encode())
-            return
         if self.path == '/upnp_redirect_1_0.xml':
             self.send_response(200)
             self.send_header('Content-type', 'application/xml')
@@ -33,54 +27,18 @@ class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
             self.wfile.write(b"Not found.")
             return
 
+    def do_POST(self):
+        # <--- Gets the size of data
+        content_length = int(self.headers['Content-Length'])
+        # <--- Gets the data itself
+        post_data = self.rfile.read(content_length)
+        logging.info("POST request,\nPath: %s\nHeaders:\n%s\n\nBody:\n%s\n",
+                     str(self.path), str(self.headers), post_data.decode('utf-8'))
+
     def get_device_xml(self):
         """
         Get the main device descriptor xml file.
         """
-        xml2 ="""<?xml version="1.0" encoding="UTF-8"?>
-<root configId="7952433" xmlns="urn:schemas-upnp-org:device-1-0" xmlns:dlna="urn:schemas-dlna-org:device-1-0">
-  <specVersion>
-    <major>1</major>
-    <minor>1</minor>
-  </specVersion>
-  <device>
-    <deviceType>urn:schemas-upnp-org:device:MediaRenderer:1</deviceType>
-    <friendlyName>Kodi_____ (L-angelstone-MAC)</friendlyName>
-    <manufacturer>XBMC Foundation</manufacturer>
-    <manufacturerURL>http://kodi.tv/</manufacturerURL>
-    <modelDescription>Kodi - Media Renderer</modelDescription>
-    <modelName>Kodi</modelName>
-    <modelNumber>17.6 Git:20171114-a9a7a20</modelNumber>
-    <modelURL>http://kodi.tv/</modelURL>
-    <UDN>uuid:f217c772-52c3-8d4f-2f38-5d20e3cd2cef</UDN>
-    <presentationURL>http://192.168.1.105:8080/</presentationURL>
-    <dlna:X_DLNADOC xmlns:dlna="urn:schemas-dlna-org:device-1-0">DMR-1.50</dlna:X_DLNADOC>
-    <serviceList>
-      <service>
-        <serviceType>urn:schemas-upnp-org:service:AVTransport:1</serviceType>
-        <serviceId>urn:upnp-org:serviceId:AVTransport</serviceId>
-        <SCPDURL>/AVTransport/f217c772-52c3-8d4f-2f38-5d20e3cd2cef/scpd.xml</SCPDURL>
-        <controlURL>/AVTransport/f217c772-52c3-8d4f-2f38-5d20e3cd2cef/control.xml</controlURL>
-        <eventSubURL>/AVTransport/f217c772-52c3-8d4f-2f38-5d20e3cd2cef/event.xml</eventSubURL>
-      </service>
-      <service>
-        <serviceType>urn:schemas-upnp-org:service:ConnectionManager:1</serviceType>
-        <serviceId>urn:upnp-org:serviceId:ConnectionManager</serviceId>
-        <SCPDURL>/ConnectionManager/f217c772-52c3-8d4f-2f38-5d20e3cd2cef/scpd.xml</SCPDURL>
-        <controlURL>/ConnectionManager/f217c772-52c3-8d4f-2f38-5d20e3cd2cef/control.xml</controlURL>
-        <eventSubURL>/ConnectionManager/f217c772-52c3-8d4f-2f38-5d20e3cd2cef/event.xml</eventSubURL>
-      </service>
-      <service>
-        <serviceType>urn:schemas-upnp-org:service:RenderingControl:1</serviceType>
-        <serviceId>urn:upnp-org:serviceId:RenderingControl</serviceId>
-        <SCPDURL>/RenderingControl/f217c772-52c3-8d4f-2f38-5d20e3cd2cef/scpd.xml</SCPDURL>
-        <controlURL>/RenderingControl/f217c772-52c3-8d4f-2f38-5d20e3cd2cef/control.xml</controlURL>
-        <eventSubURL>/RenderingControl/f217c772-52c3-8d4f-2f38-5d20e3cd2cef/event.xml</eventSubURL>
-      </service>
-    </serviceList>
-  </device>
-</root>"""
-
         xml = """<?xml version="1.0" encoding="UTF-8"?>
 <root configId="9952433" xmlns="urn:schemas-upnp-org:device-1-0" xmlns:dlna="urn:schemas-dlna-org:device-1-0">
   <specVersion>
