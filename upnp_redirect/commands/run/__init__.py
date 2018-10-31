@@ -8,7 +8,7 @@ import logging
 device_uuid = uuid.uuid4()
 local_ip_address = '192.168.1.105'
 
-http_server = UPNPHTTPServer(8088,
+http_server = UPNPHTTPServer(0,
                              friendly_name="UPNP Redirector",
                              manufacturer="Jingnan Si",
                              manufacturer_url='http://github.com/stonewell/py_upnp_redirect',
@@ -24,7 +24,7 @@ ssdp = SSDPServer()
 ssdp.register('local',
               'uuid:{}::urn:schemas-upnp-org:device:MediaRenderer:1'.format(device_uuid),
               'urn:schemas-upnp-org:device:MediaRenderer:1',
-              'http://{}:8088/upnp_redirect_1_0.xml'.format(local_ip_address))
+              'http://{}:{}/upnp_redirect_1_0.xml'.format(local_ip_address, http_server.server.port))
 
 
 class RunRedirect(object):

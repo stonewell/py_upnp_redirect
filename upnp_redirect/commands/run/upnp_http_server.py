@@ -3,9 +3,6 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import threading
 import logging
 
-PORT_NUMBER = 8080
-
-
 service_xmls_ = {}
 
 for c in ['AVTransport', 'ConnectionManager', 'RenderingControl']:
@@ -29,25 +26,30 @@ class UPNPHTTPServerHandler(BaseHTTPRequestHandler):
             self.wfile.write(self.get_device_xml().encode())
             return
         elif self.path in service_xmls_:
-            self.send_response(200)
-            self.send_header('Content-type', 'application/xml')
-            self.end_headers()
-
             c, n = service_xmls_[self.path]
-            self.wfile.write(self.load_descriptor(c, n).encode())
-            return
-        else:
-            self.send_response(404)
-            self.send_header('Content-type', 'text/html')
-            self.end_headers()
-            self.wfile.write(b"Not found.")
-            return
+            desc_xml = self.load_descriptor(c, n)
+
+            if desc_xml:
+                self.send_response(200)
+                self.send_header('Content-type', 'application/xml')
+                self.end_headers()
+
+                self.wfile.write(desc_xml.encode())
+                return
+
+        logging.warning('get path not found:%s' % self.path)
+        self.send_response(404)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        self.wfile.write(b"Not found.")
+        return
 
     @staticmethod
     def load_descriptor(category, name):
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))
         desc_path = os.path.join(BASE_DIR, 'descriptors', category, name + '.xml')
-        return open(desc_path).read()
+
+        return open(desc_path).read() if os.path.exists(desc_path) else None
 
     def do_POST(self):
         # <--- Gets the size of data
@@ -145,7 +147,7 @@ class UPNPHTTPServer(threading.Thread):
                  model_number, model_url, serial_number, uuid, presentation_url):
         threading.Thread.__init__(self, daemon=True)
         self.server = UPNPHTTPServerBase(('', port), UPNPHTTPServerHandler)
-        self.server.port = port
+        self.server.port = self.server.server_port
         self.server.friendly_name = friendly_name
         self.server.manufacturer = manufacturer
         self.server.manufacturer_url = manufacturer_url
