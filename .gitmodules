@@ -1,0 +1,3 @@
+[submodule "thirdparty/platinum"]
+	path = thirdparty/platinum
+	url = https://github.com/stonewell/Platinum.git
