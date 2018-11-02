@@ -1,0 +1,9 @@
+MEDIA_RENDERER_PATH=thirdparty/platinum
+
+.PHONY=all
+all:
+	scons -C ${MEDIA_RENDERER_PATH} -c
+	scons -C ${MEDIA_RENDERER_PATH} -j8
+	mkdir -p libs
+	find ${MEDIA_RENDERER_PATH} -name "_media_renderer.so" -exec cp {} libs \;
+	find ${MEDIA_RENDERER_PATH} -name "media_renderer.py" -exec cp {} libs \;
