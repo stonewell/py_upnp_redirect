@@ -2,8 +2,9 @@ import logging
 import media_renderer
 
 class MediaRendererDelegateImpl(media_renderer.MediaRendererDelegate):
-    def __init__(self):
+    def __init__(self, output):
         media_renderer.MediaRendererDelegate.__init__(self)
+        self._outptu = output
 
     def OnGetCurrentConnectionInfo(self, uri, data):
         logging.debug('OnGetCurrentConnectionInfo: uri={}, data={}'.format(uri, data))
