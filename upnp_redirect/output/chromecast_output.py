@@ -1,6 +1,8 @@
 import pychromecast
 import logging
 
+from . import OutputBase
+
 
 def create_chromecast_output(output_args):
     chromecasts = pychromecast.get_chromecasts()
@@ -12,7 +14,7 @@ def create_chromecast_output(output_args):
     cast.wait()
     return ChromecastOutput(cast)
 
-class ChromecastOutput(object):
+class ChromecastOutput(OutputBase):
     def __init__(self, cast):
         super(ChromecastOutput, self).__init__()
         self._cast = cast
