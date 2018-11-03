@@ -21,11 +21,16 @@ class ChromecastOutput(OutputBase):
         self._mc = cast.media_controller
 
     def OnPlay(self, *args, **kwargs):
-        logging.warning('Not implemented, OnPlay: args={}, kwargs={}'.format(args, kwargs))
-        return 0
+        logging.debug('OnPlay')
+        self._mc.play()
+
+    def OnPause(self, *args, **kwargs):
+        logging.debug('OnPause')
+        self._mc.pause()
 
     def OnStop(self, *args, **kwargs):
-        logging.warning('Not implemented, OnStop: args={}, kwargs={}'.format(args, kwargs))
+        logging.debug('OnStop')
+        self._mc.stop()
         return 0
 
     def OnSetMediaURI(self, *args, **kwargs):
