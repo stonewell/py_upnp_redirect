@@ -18,10 +18,11 @@ class RunRedirect(object):
         if not self._output:
             raise Exception('Invalid Output:{} with argument {}'.format(self._args.output_type, self._args.output_args))
 
-        self._media_renderer = media_renderer.create_media_renderer(MediaRendererDelegateImpl(self._output).__disown__(),
+        self._delegate = MediaRendererDelegateImpl(self._output).__disown__()
+        self._media_renderer = media_renderer.create_media_renderer(self._delegate,
                                                                     'Upnp Redirector (%s)' % socket.gethostname(),
                                                                     False,
-                                                                    str(uuid),
+                                                                    str(self._device_uuid),
                                                                     0,
                                                                     True)
 
@@ -30,7 +31,17 @@ class RunRedirect(object):
 
         event_exit = threading.Event()
 
-        while(event_exit.wait(timeout=10)):
-            pass
+        logging.info('media render:{} started!'.format('Upnp Redirector (%s)' % socket.gethostname()))
+        logging.debug('wait exit event...')
 
+        while True:
+            try:
+                event_exit.wait(timeout=10)
+            except KeyboardInterrupt:
+                logging.exception('event exit')
+                break
+            except:
+                pass
+
+        logging.debug('stop media renderer')
         self._media_renderer.Stop()
