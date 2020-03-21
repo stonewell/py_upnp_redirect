@@ -2,12 +2,11 @@
 redirect upnp request to chromecast or local player
 
 ## Prerequisites
-* Python 2, Platinum/scons build need python 2
 * Python 3, running the redirector need python3
 * [swig](http://www.swig.org/index.php)
 
 ## Prepare
-* install python2 and swig for python
+* install python3 and swig for python
 * get source and init all submodules
 ```
 git clone https://github.com/stonewell/py_upnp_redirect.git
@@ -16,7 +15,6 @@ git submodule update --init --recursive
 ```
 * install python dependence, install for both python2 and python3
 ```
-pip2 install -r requirements
 pip3 install -r requirements
 ```
 
@@ -34,4 +32,4 @@ python3 -m upnp_redirect run --output_args "Family Room TV"
 ```
 
 ## TODO
-* migrate everything build/run to python3 only
+- [x] migrate everything build/run to python3 only
