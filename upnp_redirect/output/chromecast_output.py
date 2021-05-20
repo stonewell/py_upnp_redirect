@@ -6,7 +6,7 @@ from . import OutputBase
 
 
 def create_chromecast_output(output_args):
-    chromecasts = pychromecast.get_chromecasts()
+    chromecasts,_ = pychromecast.get_chromecasts()
     cast = next(cc for cc in chromecasts if cc.device.friendly_name == output_args)
 
     if not cast:
