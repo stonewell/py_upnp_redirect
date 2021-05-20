@@ -4,6 +4,7 @@ Redirect UPnP request to Chromecast or local player.
 ## Prerequisites
 * Python 3, running the redirector need Python3
 * [swig](http://www.swig.org/index.php)
+* [scons](https://scons.org/)
 
 ## Prepare
 * Install Python3 and swig for Python.
